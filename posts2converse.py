@@ -10,49 +10,54 @@ def post2conversation(in_file, out_file):
 
 	f = open(in_file, 'r')
 
-	# read comments line by line
-	# each line is a comment
+	# read post line by line
+	# each line is a post
 	# in json format
 
 	# cashing data in a post
 	memo = {}
-
+	
 	for line in f:
+		p = json.loads(line)
+		
+		for comment in p:
+			
+			# each comment is a dict
+			# all dicts in a list
+			# first read all comments into cash
+			# break and sort comments into conversation
+			# write conversations into a new file
 
-		# 10 hashtags means the starting of a new post
-		# TODO: check the data to confirm
+			# add each comment into the memo
 
-		if line == "##########":
+			data = comment
+
+			post_id = data['link_id'].split('_')[1]
+			author = data['author']
+			parent_id = data['parent_id'].split('_')[1]
+
+			# t1 are comments, t3 are posts
+			parent_type = data['parent_id'].split('_')[0]
+
+			# time stamp
+			time_create = data['created_utc']
+
+			# text
+			text = data['body']
+
+			# link
+			link = data['permalink']
+
+			# save info into memo
+			row = [post_id, parent_id, author, time_create, link, text, parent_type]
+			memo[idx] = row
+			
+			# break the comments into conversations
 			
 			write2converse(memo, out_file)
 
 			# reset memo for the next post
 			memo = {}
-		
-
-		# add each line into the memo
-
-		data = json.load(line)
-
-		post_id = data['link_id'].split('_')[1]
-		author = data['author']
-		parent_id = data['parent_id'].split('_')[1]
-
-		# t1 are comments, t3 are posts
-		parent_type = data['parent_id'].split('_')[0]
-
-		# time stamp
-		time_create = data['created_utc']
-
-		# text
-		text = data['body']
-
-		# link
-		link = data['permalink']
-
-		# save info into memo
-		row = [post_id, parent_id, author, time_create, link, text, parent_type]
-		memo[idx] = row
 
 	f.close()
 
