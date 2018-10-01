@@ -1,10 +1,11 @@
 
 in_file = 'post_snippet.txt'
 out_file = 'conversation.txt'
+log_file = 'logs.txt'
 
 #------------------------ convert posts into converdations --------------------
 
-def post2conversation(in_file, out_file):
+def post2conversation(in_file, out_file, process_log):
 	import json
 	import os
 
@@ -18,9 +19,39 @@ def post2conversation(in_file, out_file):
 
 	# cashing data in a post
 	memo = {}
-	
+
+	# counter for conversations
+	conversation_counter = [0]
+
+	# read log 
+	# (post_id, counter)
+	try:
+		logs = open(process_log, 'r')
+
+		id_log = {}
+
+		for line in logs:
+			log = line.strip().split(',')
+			id_log[log[0]] = 1
+			conversation_counter[0] = int(log[1])
+
+		logs.close()
+	except IOError:
+		open(process_log, 'a').close()
+		id_log = {}
+
+	# open log file
+	logs = open(process_log, 'a')
+
 	for post in f:
 		p = json.loads(post)
+
+		# guard agaist duplicated post
+		if len(p) <= 0:
+			continue
+
+		elif p[0]['link_id'].split('_')[1] in id_log:
+			continue
 		
 		for comment in p:
 			
@@ -34,11 +65,11 @@ def post2conversation(in_file, out_file):
 
 			data = comment
 
-			# comment id
-			idx = data['id']
-
 			# link id
 			post_id = data['link_id'].split('_')[1]
+
+			# comment id
+			idx = data['id']
 
 			# author name
 			author = data['author']
@@ -75,16 +106,23 @@ def post2conversation(in_file, out_file):
 			
 		# break the post into conversations
 			
-		write2converse(memo, out_file)
+		write2converse(memo, out_file, conversation_counter)
 
 		# reset memo for the next post
 		memo = {}
 
+		# update log file
+
+		new_entry = p[0]['link_id'].split('_')[1] + ',' + str(conversation_counter[0]) + '\n'
+
+		logs.write(new_entry)
+
 	f.close()
+	logs.close()
 
 #--------------- break and write post into conversations (sub) ----------------
 
-def write2converse(memo, out_file):
+def write2converse(memo, out_file, counter):
 
 	from functools import cmp_to_key
 
@@ -171,13 +209,14 @@ def write2converse(memo, out_file):
 
 	# write conversations to file
 
-	fout = open(out_file, 'w')
+	fout = open(out_file, 'a')
 
 	for userpair in converse.keys():
 
 		# write the separator of a conversation
-
+		# also the counter
 		fout.write("==========\n")
+		fout.write("COUNTER:" + str(counter[0]) + '\n\n')
 
 		for t in converse[userpair]:
 
@@ -191,17 +230,22 @@ def write2converse(memo, out_file):
 
 			body = memo[idx][5] + '\n'
 
-			fout.write("time: " + time)
-			fout.write("author: " + author)
-			fout.write("link: " + link)
-			fout.write("comment:\n" + body)
+			
+			fout.write("TIMESTAMP:" + time)
+			fout.write("AUTHOR:" + author)
+			fout.write("LINK:" + link)
+			fout.write("COMMENT:\n" + body)
+			fout.write('END_OF_COMMENT\n')
 			fout.write('\n')
+
+		counter[0] += 1
 
 	# write single comment replied to the post
 	for idx in reply2post.keys():
 
-		# write the separator
+		# write the separator and the counter
 		fout.write("==========\n")
+		fout.write("COUNTER:" + str(counter[0]) + '\n\n')
 
 		time = memo[idx][3] + '\n'
 
@@ -211,13 +255,16 @@ def write2converse(memo, out_file):
 
 		body = memo[idx][5] + '\n'
 
-		fout.write("COMMENT TO THE POST\n")
-		fout.write("time: " + time)
-		fout.write("author: " + author)
-		fout.write("link: " + link)
-		fout.write("comment:\n" + body)
+		
+		fout.write("COMMENT_TO_THE_POST\n")
+		fout.write("TIMESTAMP:" + time)
+		fout.write("AUTHOR:" + author)
+		fout.write("LINK:" + link)
+		fout.write("COMMENT:\n" + body)
+		fout.write('END_OF_COMMENT\n')
 		fout.write('\n')
 
+		counter[0] += 1
 
 	fout.close()
 
@@ -242,4 +289,4 @@ def cmp(a, b):
 
 #------------------------------------ call main func ------------------------------
 
-post2conversation(in_file, out_file)
+post2conversation(in_file, out_file, log_file)
