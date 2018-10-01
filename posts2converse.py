@@ -1,4 +1,6 @@
 
+in_file = 'post_snippet.txt'
+out_file = 'conversation.txt'
 
 #------------------------ convert posts into converdations --------------------
 
@@ -17,8 +19,8 @@ def post2conversation(in_file, out_file):
 	# cashing data in a post
 	memo = {}
 	
-	for line in f:
-		p = json.loads(line)
+	for post in f:
+		p = json.loads(post)
 		
 		for comment in p:
 			
@@ -32,8 +34,16 @@ def post2conversation(in_file, out_file):
 
 			data = comment
 
+			# comment id
+			idx = data['id']
+
+			# link id
 			post_id = data['link_id'].split('_')[1]
+
+			# author name
 			author = data['author']
+
+			# parent id
 			parent_id = data['parent_id'].split('_')[1]
 
 			# t1 are comments, t3 are posts
@@ -41,23 +51,34 @@ def post2conversation(in_file, out_file):
 
 			# time stamp
 			time_create = data['created_utc']
+			time_create = str(time_create)
 
 			# text
 			text = data['body']
 
+			# subreddit
+			subreddit = data['subreddit']
+
 			# link
-			link = data['permalink']
+			link = "https://www.reddit.com/r/"
+			link += subreddit + '/'
+			link += "comments/"
+			link += post_id + '/'
+			link += '_/'
+			link += idx + '/'
 
 			# save info into memo
+			
 			row = [post_id, parent_id, author, time_create, link, text, parent_type]
+			
 			memo[idx] = row
 			
-			# break the comments into conversations
+		# break the post into conversations
 			
-			write2converse(memo, out_file)
+		write2converse(memo, out_file)
 
-			# reset memo for the next post
-			memo = {}
+		# reset memo for the next post
+		memo = {}
 
 	f.close()
 
@@ -92,7 +113,7 @@ def write2converse(memo, out_file):
 
 			if idx not in reply2post:
 				
-				reply2post[idx] == False
+				reply2post[idx] = False
 
 		# if the parent t1/comment
 
@@ -110,36 +131,36 @@ def write2converse(memo, out_file):
 
 			p_parent_type = memo[p_id][-1]
 
-		if (author, p_author) not in converse and (p_author, author) not in converse:
+			if (author, p_author) not in converse and (p_author, author) not in converse:
 
-			if p_parent_type == 't3':
+				if p_parent_type == 't3':
 
-				converse[(author, p_author)] = [(p_id, p_timestamp), (idx, timestamp)]
+					converse[(author, p_author)] = [(p_id, p_timestamp), (idx, timestamp)]
 
-				reply2post['p_id'] = True
+					reply2post[p_id] = True
 
-			else:
-				converse[(author, p_author)] = [(idx, timestamp)]
+				else:
+					converse[(author, p_author)] = [(idx, timestamp)]
 
-		elif (author, p_author) in converse:
+			elif (author, p_author) in converse:
 
-			if p_parent_type == 't3':
+				if p_parent_type == 't3':
 
-				converse[(author, p_author)].append((p_id, p_timestamp))
+					converse[(author, p_author)].append((p_id, p_timestamp))
 
-				reply2post['p_id'] = True
+					reply2post[p_id] = True
 
-			converse[(author, p_author)].append((idx, timestamp))
+				converse[(author, p_author)].append((idx, timestamp))
 
-		elif (p_author, author) in converse:
+			elif (p_author, author) in converse:
 
-			if p_parent_type == 't3':
+				if p_parent_type == 't3':
 
-				converse[(author, p_author)].append((p_id, p_timestamp))
+					converse[(author, p_author)].append((p_id, p_timestamp))
 
-				reply2post['p_id'] = True
+					reply2post[p_id] = True
 
-			converse[(p_author, author)].append((idx, timestamp))
+				converse[(p_author, author)].append((idx, timestamp))
 
 
 	# sort the converses by timestamp
@@ -150,7 +171,7 @@ def write2converse(memo, out_file):
 
 	# write conversations to file
 
-	fout = open(out_file, 'a')
+	fout = open(out_file, 'w')
 
 	for userpair in converse.keys():
 
@@ -170,10 +191,11 @@ def write2converse(memo, out_file):
 
 			body = memo[idx][5] + '\n'
 
-			fout.write(time)
-			fout.write(author)
-			fout.write(link)
-			fout.write(body)
+			fout.write("time: " + time)
+			fout.write("author: " + author)
+			fout.write("link: " + link)
+			fout.write("comment:\n" + body)
+			fout.write('\n')
 
 	# write single comment replied to the post
 	for idx in reply2post.keys():
@@ -189,10 +211,12 @@ def write2converse(memo, out_file):
 
 		body = memo[idx][5] + '\n'
 
-		fout.write(time)
-		fout.write(author)
-		fout.write(link)
-		fout.write(body)
+		fout.write("COMMENT TO THE POST\n")
+		fout.write("time: " + time)
+		fout.write("author: " + author)
+		fout.write("link: " + link)
+		fout.write("comment:\n" + body)
+		fout.write('\n')
 
 
 	fout.close()
@@ -201,8 +225,8 @@ def write2converse(memo, out_file):
 def cmp(a, b):
 	import datetime
 
-	t1 = datetime.datetime.fromtimestamp(a[1])
-	t2 = datetime.datetime.fromtimestamp(b[1])
+	t1 = datetime.datetime.fromtimestamp(int(a[1]))
+	t2 = datetime.datetime.fromtimestamp(int(b[1]))
 
 	if t1 < t2:
 
@@ -215,3 +239,7 @@ def cmp(a, b):
 	else:
 
 		return 1
+
+#------------------------------------ call main func ------------------------------
+
+post2conversation(in_file, out_file)
