@@ -3,6 +3,10 @@ in_file = 'post_snippet.txt'
 out_file = 'conversation.txt'
 log_file = 'logs.txt'
 
+annotation_file = 'annotation.txt'
+
+candidates = {'disability':1, 'amputee':1, 'Prosthetics':1}
+
 #------------------------ convert posts into converdations --------------------
 
 def post2conversation(in_file, out_file, process_log):
@@ -53,6 +57,9 @@ def post2conversation(in_file, out_file, process_log):
 		elif p[0]['link_id'].split('_')[1] in id_log:
 			continue
 		
+		# use subreddit to screen post for annotation
+		sub = p[0]['subreddit']
+
 		for comment in p:
 			
 			# each comment is a dict
@@ -105,8 +112,12 @@ def post2conversation(in_file, out_file, process_log):
 			memo[idx] = row
 			
 		# break the post into conversations
+		conversation_counter_copy = conversation_counter.copy()
 			
 		write2converse(memo, out_file, conversation_counter)
+
+		if sub in candidates:
+			write2converse(memo, annotation_file, conversation_counter_copy)
 
 		# reset memo for the next post
 		memo = {}
@@ -238,6 +249,8 @@ def write2converse(memo, out_file, counter):
 			fout.write('END_OF_COMMENT\n')
 			fout.write('\n')
 
+		print("Writing conversation NO. " + str(counter[0]) + '...')
+
 		counter[0] += 1
 
 	# write single comment replied to the post
@@ -264,6 +277,8 @@ def write2converse(memo, out_file, counter):
 		fout.write('END_OF_COMMENT\n')
 		fout.write('\n')
 
+		print("Writing conversation NO. " + str(counter[0]) + '...')
+		
 		counter[0] += 1
 
 	fout.close()
