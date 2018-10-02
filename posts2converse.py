@@ -179,6 +179,14 @@ def write2converse(memo, out_file, counter):
 				
 				reply2post[idx] = False
 
+		# if parent missing
+		# handle as reply to post
+		elif memo[idx][1] not in memo:
+
+			if idx not in reply2post:
+
+				reply2post[idx] = False
+
 		# if the parent t1/comment
 
 		else:
