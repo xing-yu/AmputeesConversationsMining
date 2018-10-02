@@ -1,10 +1,17 @@
 
+# input file, containing posts in JSON format
 in_file = 'post_snippet.txt'
+
+# output file, containing conversations
 out_file = 'conversation.txt'
+
+# log file, keep track of how many posts have been processed
 log_file = 'logs.txt'
 
+# a separate copy that screens out most useful post for annotation
 annotation_file = 'annotation.txt'
 
+# candidate subreddits for screening posts
 candidates = {'disability':1, 'amputee':1, 'Prosthetics':1}
 
 #------------------------ convert posts into converdations --------------------
@@ -278,7 +285,7 @@ def write2converse(memo, out_file, counter):
 		fout.write('\n')
 
 		print("Writing conversation NO. " + str(counter[0]) + '...')
-		
+
 		counter[0] += 1
 
 	fout.close()
