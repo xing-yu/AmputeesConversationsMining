@@ -220,7 +220,7 @@ def write2converse(memo, out_file, counter):
 
 				if p_parent_type == 't3':
 
-					converse[(author, p_author)].append((p_id, p_timestamp))
+					converse[(p_author, author)].append((p_id, p_timestamp))
 
 					reply2post[p_id] = True
 
