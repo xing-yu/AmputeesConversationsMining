@@ -1,18 +1,26 @@
 
-# input file, containing posts in JSON format
-in_file = 'post_snippet.txt'
+import sys
 
-# output file, containing conversations
-out_file = 'conversation.txt'
+print(sys.argv)
 
-# log file, keep track of how many posts have been processed
-log_file = 'logs.txt'
+if len(sys.argv) != 3:
+	print('usage: python3 post2conversation path_to_input_file, path_to_output_files')
+	sys.exit(-1)
+else:
+	# input file, containing posts in JSON format
+	in_file = sys.argv[1]
 
-# a separate copy that screens out most useful post for annotation
-annotation_file = 'annotation.txt'
+	# output file, containing conversations
+	out_file = sys.argv[2] + '/conversation.txt'
 
-# candidate subreddits for screening posts
-candidates = {'disability':1, 'amputee':1, 'Prosthetics':1}
+	# log file, keep track of how many posts have been processed
+	log_file = sys.argv[2] + '/logs.txt'
+
+	# a separate copy that screens out most useful post for annotation
+	annotation_file = sys.argv[2] + '/annotation.txt'
+
+	# candidate subreddits for screening posts
+	candidates = {'disability':1, 'amputee':1, 'Prosthetics':1}
 
 #------------------------ convert posts into converdations --------------------
 
