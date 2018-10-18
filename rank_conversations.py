@@ -17,7 +17,7 @@ def main(fname):
 
 	conversations_sorted = sort_conversations(conversations)
 
-	fout = open("annotation_sort.txt", 'w')
+	fout = open("./output/annotation_sort.txt", 'w')
 
 	for each in conversations_sorted:
 
@@ -70,7 +70,7 @@ def sort_conversations(convers):
 
 	from functools import cmp_to_key
 
-	ret = sorted(convers, key = cmp_to_key(cmp))
+	ret = sorted(convers, key = cmp_to_key(cmp), reverse = True)
 
 	return ret
 
