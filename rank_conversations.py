@@ -11,7 +11,7 @@ fname = sys.argv[1]	# input file name, format is conversation
 #------------------- main function --------------------------
 def main(fname):
 
-	fin = open(fname)
+	fin = open(fname, 'r')
 
 	conversations = parse_conversations(fin)
 
@@ -21,6 +21,7 @@ def main(fname):
 
 	for each in conversations_sorted:
 
+		print(each[0])
 		fout.write(each[1])
 
 	fin.close()
