@@ -2,7 +2,7 @@
 
 import sys
 
-if len(argv) < 2:
+if len(sys.argv) < 2:
 	print("usage: script input_file")
 	sys.exit(-1)
 
