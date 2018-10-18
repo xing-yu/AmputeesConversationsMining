@@ -56,7 +56,7 @@ def parse_conversations(f):
 			if line == "COMMENT\n":
 				mark = True
 
-			if line == "END_OF COMMENT\n":
+			if line == "END_OF_COMMENT\n":
 				mark = False
 
 			if mark == True:
