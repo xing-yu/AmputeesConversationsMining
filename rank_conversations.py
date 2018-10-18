@@ -41,6 +41,7 @@ def parse_conversations(f):
 		# end of a conversation
 
 		if line == "==========\n":
+			print(body)
 
 			word_count = len(body.split(' '))
 
