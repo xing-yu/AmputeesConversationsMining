@@ -32,6 +32,8 @@ def parse_conversations(f):
 	ret = []
 
 	mark = False # mark body
+	content = ''
+	body = ''
 
 	for line in f:
 
