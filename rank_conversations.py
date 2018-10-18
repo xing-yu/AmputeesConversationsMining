@@ -40,7 +40,7 @@ def parse_conversations(f):
 
 		# end of a conversation
 
-		if line == "==========":
+		if line == "==========\n":
 
 			word_count = len(body.split(' '))
 
@@ -61,7 +61,7 @@ def parse_conversations(f):
 
 			if mark == True:
 				body += line
-	print(ret)
+
 	return ret
 
 #----------------- rank conversation ------------------------
