@@ -42,7 +42,7 @@ def parse_conversations(f):
 
 		if line == "==========\n":
 
-			word_count = len(body.split(' '))
+			word_count = len(body)
 
 			ret.append((word_count, content))
 
