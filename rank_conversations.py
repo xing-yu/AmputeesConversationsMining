@@ -21,8 +21,9 @@ def main(fname):
 
 	for each in conversations_sorted:
 
-		print(each[0])
 		fout.write(each[1])
+		fout.write('\n')
+		fout.write('==========\n')
 
 	fin.close()
 	fout.close()
@@ -41,7 +42,7 @@ def parse_conversations(f):
 		# end of a conversation
 
 		if line == "==========\n":
-			print(body)
+			#print(line)
 
 			word_count = len(body.split(' '))
 
@@ -54,15 +55,15 @@ def parse_conversations(f):
 
 			content += line
 
-			if line == "COMMENT\n":
-				print(line)
+			if line == "COMMENT:\n":
+				#print(line)
 				mark = True
 
-			if line == "END_OF_COMMENT\n":
-				
+			elif line == "END_OF_COMMENT\n":
+
 				mark = False
 
-			if mark == True:
+			elif mark == True:
 				body += line
 
 	return ret
