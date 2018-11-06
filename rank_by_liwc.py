@@ -1,6 +1,11 @@
 # this program ranks the conversations by a chosen category in LIWC
 
+from nltk.stem import PorterStemmer
+
+ps = PorterStemmer()
+
 # load dictionary
+# return: {header}, {words}
 def load_dict(dictionary_file):
 
     header = {}
@@ -30,5 +35,23 @@ def load_dict(dictionary_file):
             # save header info
 
             if header == True:
+                # {int: str}
+                header[int(data[0])] = data[1]
 
+            # if not header, load the word and category
+            else:
+
+                word = data[0]
+
+                if word[-1] == *:
+                    word = word[:-1]
+
+                stemmed_word = ps.stem(word)
                 
+                # {str: [int]}
+                words[stemmed_word] = list(map(int, data[1:]))
+
+    return header, words
+
+# count frequency function
+def count_words(text, dict):
