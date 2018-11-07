@@ -1,0 +1,1 @@
+python3 rank_by_liwc.py ./output/annotation.txt ./dict/LIWC2015_English_Flat.dic health
