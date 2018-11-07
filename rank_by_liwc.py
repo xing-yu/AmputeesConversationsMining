@@ -1,6 +1,7 @@
 # this program ranks the conversations by a chosen category in LIWC
 
 from nltk.stem import PorterStemmer
+from nltk import word_tokenize
 
 ps = PorterStemmer()
 
@@ -55,3 +56,5 @@ def load_dict(dictionary_file):
 
 # count frequency function
 def count_words(text, dict):
+
+    tokens = word_tokenize(text)
