@@ -4,6 +4,36 @@ The functions utilize the pushshift API (https://github.com/pushshift/api) to ge
 
 """
 
+# a python wrap function of the pushshift api
+def search(endpoint = None, **kwargs = None):
+
+	if not endpoint:
+		print("An endpoint must be provided")
+		return
+
+	import requests
+
+	url = "https://api.pushshift.io/reddit/" + endpoint + "/search?"
+
+	para = []
+
+	for key, value in kwargs.items():
+
+		para.append(key + "=" + value)
+
+	if len(para) > 0:
+
+		url += "&".join(para)
+
+	r = requests.get(url)
+
+	if r.status_code != 200:
+		return None
+
+	else:
+		return r.json()["data"]
+
+# search comments by submission id
 def searchComments(fields_values_pairs, sort_type = "created_utc", sort = "asc", size = "500"):
 
 	import requests
@@ -29,6 +59,7 @@ def searchComments(fields_values_pairs, sort_type = "created_utc", sort = "asc",
 	else:
 		return r.json()["data"]
 
+# dump data
 def saveToFile(data, fout):
 
 	import json

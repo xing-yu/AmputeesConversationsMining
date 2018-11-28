@@ -1,0 +1,1 @@
+python3 ./post2conversations/posts2converse.py post_snippet.txt ./output

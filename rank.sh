@@ -1,1 +1,1 @@
-python3 rank_conversations.py ./output/annotation.txt
+python3 ./rank/rank_conversations.py ./output/annotation.txt
