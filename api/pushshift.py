@@ -5,7 +5,7 @@ The functions utilize the pushshift API (https://github.com/pushshift/api) to ge
 """
 
 # a python wrap function of the pushshift api
-def search(endpoint = None, **kwargs = None):
+def search(endpoint = None, **kwargs):
 
 	if not endpoint:
 		print("An endpoint must be provided")
@@ -19,7 +19,7 @@ def search(endpoint = None, **kwargs = None):
 
 	for key, value in kwargs.items():
 
-		para.append(key + "=" + value)
+		para.append(str(key) + "=" + str(value))
 
 	if len(para) > 0:
 

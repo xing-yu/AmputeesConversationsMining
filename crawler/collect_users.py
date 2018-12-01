@@ -9,7 +9,7 @@ sys.path.append('../api')
 import pushshift
 
 
-subreddits = ()
+subreddits = ["amputee"]
 
 #------------------ main ------------------
 def main(subreddits):
@@ -32,6 +32,8 @@ def collect_usernames(subreddit):
 		# timestamp lower bound of api data
 		before = []
 
+		print("Starting crawling data from %s : %s"%(subreddit, endpoint))
+
 		# search endpoint
 		data = pushshift.search(endpoint, subreddit = subreddit)
 
@@ -43,7 +45,7 @@ def collect_usernames(subreddit):
 
 			data = pushshift.search(endpoint, subreddit = subreddit, before = before[0])
 
-			if data == None:
+			if data == []:
 				break
 
 			else:
@@ -55,7 +57,7 @@ def collect_usernames(subreddit):
 	for username in memo.keys():
 		fout.write(username)
 		fout.write(',')
-		fout.write(','.join(memo[username]))
+		fout.write(','.join(list(set(memo[username]))))
 		fout.write('\n')
 
 	fout.close()
@@ -65,39 +67,37 @@ def process(data, memo, before):
 
 	for line in data:
 
-		comments = json.loads(line)
+		try:
+			# get username
+			author = line['author']
 
-		for comment in comments:
+			# get flair text if any
+			flair_text = line['author_flair_text']
 
-			try:
-				# get username
-				author = comment['author']
+			# get timestamp
+			timestamp = line['created_utc']
+			time = datetime.datetime.fromtimestamp(timestamp)
 
-				# get flair text if any
-				flair_text = comment['author_flair_text']
+			# record username
+			if author not in memo:
+				memo[author] = []			
+			
+			# record flair text
+			# may be multiple since each subreddit can have one
+			if flair_text != None:
+				memo[author].append(flair_text)
 
-				# get timestamp
-				timestamp = comment['created_utc']
-				time = datetime.datetime.fromtimestamp(timestamp)
+			# update lower boundary
+			if len(before) == 0:
+				before.append(timestamp)
 
-				# record username
-				if author not in memo:
-					memo[author] = []
-				
-				# record flair text
-				# may be multiple since each subreddit can have one
-				if flair_text != None:
-					memo[author].append(flair_text)
+			elif time < datetime.datetime.fromtimestamp(before[0]):
+				before[0] = timestamp
 
-				# update lower boundary
-				if len(before) == 0:
-					before[0] = timestamp
+			print("Username: %s, Flair_text : %s, Time: %s" % (author, flair_text, timestamp))
 
-				elif time < datetime.datetime.fromtimestamp(before[0]):
-					before[0] = timestamp
-
-			except:
-				continue
+		except Exception as e:
+			print(e)
 
 #------------------ call main func -----------------
 main(subreddits)
