@@ -45,7 +45,7 @@ def collect_usernames(subreddit):
 
 			data = pushshift.search(endpoint, subreddit = subreddit, before = before[0])
 
-			if data == []:
+			if data == [] or data == None:
 				break
 
 			else:
